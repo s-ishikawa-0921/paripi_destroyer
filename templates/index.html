@@ -136,7 +136,7 @@ function destroy() {
     fd.append("uploadFile", $("#uploadFile").prop("files")[0] );
   }
   $.ajax({
-      url : "./destroy_paripi/"
+      url : "./destroy_paripi/",
       type : "POST",
       dataType : "json",
       data : fd,
