@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, jsonify, abort, make_response, request
+from flask import Flask, jsonify, abort, make_response, request, render_template
 from flask_cors import CORS
 
 import cv2
@@ -22,16 +22,20 @@ import object_detection_util
 
 
 # ---------------------------------------------------------------------------------
-# API
+# app
 # ---------------------------------------------------------------------------------
-api = Flask(__name__,static_folder='front')
-CORS(api)
+app = Flask(__name__)
+CORS(app)
 
-api.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 UPLOAD_DIR = 'temp/'
 
 
-@api.route('/check_paripi/', methods=['POST'])
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/check_paripi/', methods=['POST'])
 def check_paripi():
 
     file_path = save_file()
@@ -47,7 +51,7 @@ def check_paripi():
     # Unicodeにしたくない場合は↓
     # return make_response(json.dumps(result, ensure_ascii=False))
 
-@api.route('/destroy_paripi/', methods=['POST'])
+@app.route('/destroy_paripi/', methods=['POST'])
 def destroy_paripi():
 
     image_path = save_file()
@@ -90,9 +94,9 @@ def save_file():
 def remove_file(file_path):
     os.remove(file_path)
 
-@api.errorhandler(404)
+@app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
-    api.run(debug=False, host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=80)
