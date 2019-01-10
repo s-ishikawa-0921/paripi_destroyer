@@ -24,7 +24,7 @@ import object_detection_util
 # ---------------------------------------------------------------------------------
 # API
 # ---------------------------------------------------------------------------------
-api = Flask(__name__)
+api = Flask(__name__,static_folder='front')
 CORS(api)
 
 api.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
