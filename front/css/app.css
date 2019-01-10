@@ -1,0 +1,79 @@
+*, :before, :after { box-sizing: border-box; }
+
+body {
+  background-color: #1d1f20;
+  color: #e5e5e5;
+  font: 16px/1.25 'Raleway', sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(to top right, #060628, #1F245A, #682359);
+}
+
+/* loading */
+#loading {
+  display: none;
+  position:fixed;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+}
+#loading span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 -25px;
+  line-height: 50px;
+  font-size: 30px;
+  color: #fff;
+  text-align: center;
+  background-color: rgba(0,0,0,0.7);
+  border-radius :5px;
+}
+
+svg.radial-progress {
+  height: auto;
+  max-width: 200px;
+  padding: 1em;
+  transform: rotate(-90deg);
+  width: 100%;
+}
+
+svg.radial-progress circle {
+  fill: rgba(0,0,0,0);
+  stroke: #fff;
+  stroke-dashoffset: 219.91148575129; /* Circumference */
+  stroke-width: 10;
+}
+
+svg.radial-progress circle.incomplete { opacity: 0.25; }
+
+svg.radial-progress circle.complete { stroke-dasharray: 219.91148575129; /* Circumference */ }
+
+svg.radial-progress text {
+  fill: #fff;
+  font: 400 1em/1 'Oswald', sans-serif;
+  text-anchor: middle;
+}
+
+/*** COLORS ***/
+/* Primary */
+
+svg.radial-progress:nth-of-type(6n+1) circle { stroke: #a2ed56; }
+
+/* Secondary */
+
+svg.radial-progress:nth-of-type(6n+2) circle { stroke: #83e4e2; }
+
+/* Tertiary */
+
+svg.radial-progress:nth-of-type(6n+3) circle { stroke: #fd6470; }
+
+/* Quaternary */
+
+svg.radial-progress:nth-of-type(6n+4) circle { stroke: #fca858; }
+
+/* Quinary */
+
+svg.radial-progress:nth-of-type(6n+5) circle { stroke: #fddc32; }

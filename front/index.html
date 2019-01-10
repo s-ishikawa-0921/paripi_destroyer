@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=0" />
+
+<title>paripi destroyer</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link rel="stylesheet" href="css/app.css" />
+<style>
+.area-score {
+  display:none;
+}
+
+#uploadFile {
+  opacity:0;
+}
+</style>
+</head>
+<body>
+  <!--/* ローディングウィンドウ */-->
+  <div id="loading"><span><i class="fas fa-spinner fa-spin"></i></span></div>
+  <main>
+    <div class="container p-3">
+      <div class="row text-center">
+        <div class="col">
+          <img class="img-fluid" src="img/logo.png" />
+        </div>
+        <div class="w-100"></div>
+
+        <div class="col pt-5">
+          <button id="upload" type="button" class="btn btn-lg btn-danger">まずはパリピ度をチェック</button>
+          <br />
+          <input id="uploadFile" type="file" accept="image/jpeg"></input>
+        </div>
+        <div class="w-100"></div>
+
+        <div class="col-md-6 px-5">
+          <div id="upload-image"></div>
+        </div>
+        <div class="col-md-6">
+          <div class="area-score">
+            <label>パリピ度</label>
+            <svg class="radial-progress" data-percentage="33" viewBox="0 0 80 80">
+                <circle class="incomplete" cx="40" cy="40" r="35"></circle>
+                <circle class="complete" cx="40" cy="40" r="35" style="stroke-dashoffset: 39.58406743523136;"></circle>
+                <text class="percentage" x="50%" y="57%" transform="matrix(0, 1, -1, 0, 80, 0)">33%</text>
+            </svg>
+          </div>
+        </div>
+        <div class="w-100"></div>
+        <div class="col area-score">
+          <button id="destroy" type="button" class="btn btn-sm btn-danger">destroy</button>
+          <label style="color: #8080ff">この処理はやり直しできません</label>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+<script src="js/app.js"></script>
+<script>
+$(function() {
+  $('#upload').click(function() {
+    $('#uploadFile').click();
+  });
+  $('#uploadFile').on('change', function() {
+    $('#upload-image').html('');
+    for (var i = 0; i < this.files.length; i++) {
+      var file = this.files[i];
+      fr = new FileReader();
+      fr.onload = function(e) {
+          var img = $('<img>');
+          img.attr('src', e.target.result);
+          img.addClass('img-fluid');
+          $('#upload-image').append(img);
+      };
+      fr.readAsDataURL(file);
+    }
+    check();
+  });
+  $("#destroy").click(function() {
+    destroy();
+  });
+});
+function check() {
+
+  $(".area-score").hide();
+  var fd = new FormData();
+  if ($("#uploadFile").val()!== '') {
+    fd.append("uploadFile", $("#uploadFile").prop("files")[0] );
+  }
+  $.ajax(
+    "./check_paripi",
+    {
+      type : "POST",
+      dataType : "json",
+      data : fd,
+      processData : false,
+      contentType : false
+    }
+  ).done(function( data ){
+    $(".area-score").show();
+    animateRate(Math.round(data.paripi * 100));
+  });
+}
+
+function animateRate(percent) {
+
+  $('svg.radial-progress').each(function( index, value ) {
+
+    //$(value).attr('data-percentage', percent);
+    $(value).find('.percentage').html(percent+"%");
+
+    $(this).find($('circle.complete')).removeAttr( 'style' );
+    // Get percentage of progress
+    //percent = $(value).data('percentage');
+    // Get radius of the svg's circle.complete
+    radius = $(this).find($('circle.complete')).attr('r');
+    // Get circumference (2πr)
+    circumference = 2 * Math.PI * radius;
+    // Get stroke-dashoffset value based on the percentage of the circumference
+    strokeDashOffset = circumference - ((percent * circumference) / 100);
+    // Transition progress for 1.25 seconds
+    $(this).find($('circle.complete')).animate({'stroke-dashoffset': strokeDashOffset}, 650);
+  });
+}
+
+function destroy() {
+  var fd = new FormData();
+  if ($("#uploadFile").val()!== '') {
+    fd.append("uploadFile", $("#uploadFile").prop("files")[0] );
+  }
+  $.ajax(
+    "./destroy_paripi",
+    {
+      type : "POST",
+      dataType : "json",
+      data : fd,
+      processData : false,
+      contentType : false
+    }
+  ).done(function( data ){
+    $("#upload-image").find('img').attr('src', data.binary);
+  });
+}
+
+</script>
+</body>
+</html>
