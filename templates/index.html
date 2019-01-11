@@ -39,6 +39,7 @@
         <div class="w-100"></div>
 
         <div class="col-md-6 px-5">
+          <canvas id="canvas" width="0" height="0" style="display:none"></canvas>
           <div id="upload-image"></div>
         </div>
         <div class="col-md-6">
@@ -53,7 +54,8 @@
         </div>
         <div class="w-100"></div>
         <div class="col area-score">
-          <label style="color: #8080ff">手にモザイクをかけて</label>
+
+
           <button id="destroy" type="button" class="btn btn-sm btn-danger">destroy</button>
         </div>
       </div>
@@ -65,24 +67,83 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 <script src="/static/js/app.js"></script>
 <script>
+
+var file = null; // 選択されるファイル
+var blob = null; // 画像(BLOBデータ)
+
+const THUMBNAIL_WIDTH = 500; // 画像リサイズ後の横の長さの最大値
+const THUMBNAIL_HEIGHT = 500; // 画像リサイズ後の縦の長さの最大値
+
 $(function() {
   $('#upload').click(function() {
     $('#uploadFile').click();
   });
   $('#uploadFile').on('change', function() {
     $('#upload-image').html('');
-    for (var i = 0; i < this.files.length; i++) {
-      var file = this.files[i];
-      fr = new FileReader();
-      fr.onload = function(e) {
-          var img = $('<img>');
-          img.attr('src', e.target.result);
-          img.addClass('img-fluid');
-          $('#upload-image').append(img);
-      };
-      fr.readAsDataURL(file);
+    file = $(this).prop('files')[0];
+
+    // 選択されたファイルが画像かどうか判定
+    if (file.type != 'image/jpeg' && file.type != 'image/png') {
+      // 画像でない場合は終了
+      file = null;
+      blob = null;
+      return;
     }
-    check();
+
+
+    // 画像をリサイズする
+    var image = new Image();
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      image.onload = function() {
+        var width, height;
+        if(image.width > image.height){
+          // 横長の画像は横のサイズを指定値にあわせる
+          var ratio = image.height/image.width;
+          width = THUMBNAIL_WIDTH;
+          height = THUMBNAIL_WIDTH * ratio;
+        } else {
+          // 縦長の画像は縦のサイズを指定値にあわせる
+          var ratio = image.width/image.height;
+          width = THUMBNAIL_HEIGHT * ratio;
+          height = THUMBNAIL_HEIGHT;
+        }
+        // サムネ描画用canvasのサイズを上で算出した値に変更
+        var canvas = $('#canvas')
+                     .attr('width', width)
+                     .attr('height', height);
+        var ctx = canvas[0].getContext('2d');
+        // canvasに既に描画されている画像をクリア
+        ctx.clearRect(0,0,width,height);
+        // canvasにサムネイルを描画
+        ctx.drawImage(image,0,0,image.width,image.height,0,0,width,height);
+
+        // canvasからbase64画像データを取得
+        var base64 = canvas.get(0).toDataURL('image/jpeg');
+        // base64からBlobデータを作成
+        var barr, bin, i, len;
+        bin = atob(base64.split('base64,')[1]);
+        len = bin.length;
+        barr = new Uint8Array(len);
+        i = 0;
+        while (i < len) {
+          barr[i] = bin.charCodeAt(i);
+          i++;
+        }
+        blob = new Blob([barr], {type: 'image/jpeg'});
+        //console.log(blob);
+
+        var img = $('<img>');
+        img.attr('src', base64);
+        img.addClass('img-fluid');
+        $('#upload-image').append(img);
+
+        check();
+      }
+      image.src = e.target.result;
+    }
+    reader.readAsDataURL(file);
+
   });
   $("#destroy").click(function() {
     destroy();
@@ -91,10 +152,12 @@ $(function() {
 function check() {
 
   $(".area-score").hide();
-  var fd = new FormData();
-  if ($("#uploadFile").val()!== '') {
-    fd.append("uploadFile", $("#uploadFile").prop("files")[0] );
+
+  if(!file || !blob) {
+    return;
   }
+  var fd = new FormData();
+  fd.append('uploadFile', blob, file.name); // ファイルを添付する
   $.ajax({
       url : "./check_paripi/",
       type : "POST",
@@ -131,10 +194,12 @@ function animateRate(percent) {
 }
 
 function destroy() {
-  var fd = new FormData();
-  if ($("#uploadFile").val()!== '') {
-    fd.append("uploadFile", $("#uploadFile").prop("files")[0] );
+
+  if(!file || !blob) {
+    return;
   }
+  var fd = new FormData();
+  fd.append('uploadFile', blob, file.name); // ファイルを添付する
   $.ajax({
       url : "./destroy_paripi/",
       type : "POST",
