@@ -86,9 +86,13 @@ $(function() {
     var orientation = 0;
     EXIF.getData(file, function(){
         orientation = file.exifdata.Orientation;
+
+          alert(orientation);
+          
         if(orientation === undefined){
             orientation = 1;
         }
+
 
         // 選択されたファイルが画像かどうか判定
         if (file.type != 'image/jpeg' && file.type != 'image/png') {
