@@ -127,7 +127,7 @@ $(function() {
             // canvasに既に描画されている画像をクリア
             ctx.clearRect(0,0,width,height);
             // canvasにサムネイルを描画
-            //ctx.drawImage(image,0,0,image.width,image.height,0,0,width,height);
+            ctx.drawImage(image,0,0,image.width,image.height,0,0,width,height);
 
 
 
@@ -140,6 +140,13 @@ $(function() {
 
 
             switch(orientation){
+
+              // case 1:
+				    	// 	ctx.transform(1, 0, 0, 1, canvas_width, 0);
+				    	// 	ctx.rotate((90 * Math.PI) / 180);
+				    	// 	draw_width = canvas_height;
+				    	// 	draw_height = canvas_width;
+				    	// break;
 
 				    	case 2:
 				    		ctx.transform(-1, 0, 0, 1, canvas_width, 0);
@@ -186,8 +193,7 @@ $(function() {
 
 				    }
 
-            $('#canvas').width(draw_width);
-					  $('#canvas').height(draw_height);
+            $('#canvas').attr('width', draw_width).attr('height', draw_height);
             ctx.drawImage(image, 0, 0, draw_width, draw_height);
 
 
