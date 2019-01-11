@@ -67,7 +67,7 @@ def destroy_paripi():
     cv2.imwrite(image_path, result_image)
     b64 = base64.encodestring(open(image_path, 'rb').read())
 
-    #remove_file(image_path)
+    remove_file(image_path)
 
     result = {
         "binary": 'data:image/png;base64,' + b64.decode('utf8')
