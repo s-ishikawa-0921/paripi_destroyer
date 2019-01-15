@@ -39,7 +39,10 @@
         <div class="w-100"></div>
 
         <div class="col-md-6 px-5">
-          <canvas id="canvas" width="0" height="0" style="display:none"></canvas>
+          <!--
+          <canvas id="canvas" width="0" height="0" ></canvas>
+        -->
+          <canvas id="canvas" style="display:none"></canvas>
           <div id="upload-image"></div>
         </div>
         <div class="col-md-6">
@@ -87,7 +90,7 @@ $(function() {
     EXIF.getData(file, function(){
         orientation = file.exifdata.Orientation;
 
-          alert(orientation);
+          //alert(orientation);
 
         if(orientation === undefined){
             orientation = 1;
@@ -120,81 +123,119 @@ $(function() {
               height = THUMBNAIL_HEIGHT;
             }
             // サムネ描画用canvasのサイズを上で算出した値に変更
-            var canvas = $('#canvas')
-                         .attr('width', width)
-                         .attr('height', height);
+            // var canvas = $('#canvas')
+            //              .attr('width', width)
+            //              .attr('height', height);
+
+
+            var canvas = $('#canvas');
             var ctx = canvas[0].getContext('2d');
             // canvasに既に描画されている画像をクリア
-            ctx.clearRect(0,0,width,height);
+            //ctx.clearRect(0,0,width,height);
             // canvasにサムネイルを描画
-            ctx.drawImage(image,0,0,image.width,image.height,0,0,width,height);
 
 
+            // 変換なし
+            //canvas.attr('width', image.height).attr('height', image.width);
+            // ctx.transform(1, 0, 0, 1, image.height, 0);
+					  // ctx.rotate((90 * Math.PI) / 180);
+            //
+            // ctx.drawImage(image,0,0);
+
+            // 変換あり
+            // canvas.attr('width', height).attr('height', width);
+            // ctx.transform(1, 0, 0, 1, height, 0);
+            // ctx.rotate((90 * Math.PI) / 180);
+            // ctx.drawImage(image,0,0,image.width,image.height,0,0,width,height);
+
+
+
+
+
+            //ctx.rotate(-Math.PI * 0.5);
+
+            // ctx.drawImage(image,0,0,image.width,image.height,0,0,width,height);
+            //
+            //
+            //
+            //
+            // ctx.transform(1, 0, 0, 1, width, 0);
+            // ctx.rotate((90 * Math.PI) / 180);
+
+            //ctx.drawImage(image,0,0,image.width,image.height,0,0,height,width);
+            //ctx.drawImage(image,0,0,image.height,image.width,0,0,width,height);
+
+
+            //ctx.drawImage(image,0,0,width,height,0,0,height,width);
 
             //描画サイズを指定
             canvas_width = width;
 			    	canvas_height = height;
 
-            draw_width = width;
-            draw_height = height;
-
 
             switch(orientation){
 
-              // case 1:
-				    	// 	ctx.transform(1, 0, 0, 1, canvas_width, 0);
-				    	// 	ctx.rotate((90 * Math.PI) / 180);
-				    	// 	draw_width = canvas_height;
-				    	// 	draw_height = canvas_width;
-				    	// break;
-
 				    	case 2:
+                canvas.attr('width', canvas_width).attr('height', canvas_height);
 				    		ctx.transform(-1, 0, 0, 1, canvas_width, 0);
 				    	break;
 
 				    	case 3:
+                canvas.attr('width', canvas_width).attr('height', canvas_height);
 				    		ctx.transform(-1, 0, 0, -1, canvas_width, canvas_height);
 				    	break;
 
 				    	case 4:
+                canvas.attr('width', canvas_width).attr('height', canvas_height);
 				    		ctx.transform(1, 0, 0, -1, 0, canvas_height);
 				    	break;
 
 				    	case 5:
+                canvas_width = height;
+                canvas_height = width;
+                canvas.attr('width', canvas_width).attr('height', canvas_height);
 				    		ctx.transform(-1, 0, 0, 1, 0, 0);
 				    		ctx.rotate((90 * Math.PI) / 180);
-				    		draw_width = canvas_height;
-				    		draw_height = canvas_width;
 				    	break;
 
 				    	case 6:
+                canvas_width = height;
+                canvas_height = width;
+                canvas.attr('width', canvas_width).attr('height', canvas_height);
 				    		ctx.transform(1, 0, 0, 1, canvas_width, 0);
 				    		ctx.rotate((90 * Math.PI) / 180);
-				    		draw_width = canvas_height;
-				    		draw_height = canvas_width;
 				    	break;
 
 				    	case 7:
+                canvas_width = height;
+                canvas_height = width;
+                canvas.attr('width', canvas_width).attr('height', canvas_height);
 				    		ctx.transform(-1, 0, 0, 1, canvas_width, canvas_height);
 				    		ctx.rotate((-90 * Math.PI) / 180);
-				    		draw_width = canvas_height;
-				    		draw_height = canvas_width;
 				    	break;
 
 				    	case 8:
+                canvas_width = height;
+                canvas_height = width;
+                canvas.attr('width', canvas_width).attr('height', canvas_height);
 				    		ctx.transform(1, 0, 0, 1, 0, canvas_height);
 				    		ctx.rotate((-90 * Math.PI) / 180);
-				    		draw_width = canvas_height;
-				    		draw_height = canvas_width;
 				    	break;
 
 				    	default:
+                canvas.attr('width', canvas_width).attr('height', canvas_height);
 				    	break;
 
 				    }
 
-            $('#canvas').attr('width', draw_width).attr('height', draw_height);
-            ctx.drawImage(image, 0, 0, draw_width, draw_height);
+            ctx.drawImage(image,0,0,image.width,image.height,0,0,width,height);
+
+            //$('#canvas').attr('width', draw_width).attr('height', draw_height);
+            //ctx.drawImage(image,0,0,draw_width,draw_height,0,0,draw_width,draw_height);
+            //$('#canvas').width(draw_width);
+					  //$('#canvas').height(draw_height);
+
+            //ctx.drawImage(image, 0, 0, draw_width, draw_height);
 
 
 
