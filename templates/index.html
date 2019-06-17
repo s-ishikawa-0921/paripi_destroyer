@@ -76,8 +76,8 @@
 var file = null; // 選択されるファイル
 var blob = null; // 画像(BLOBデータ)
 
-const THUMBNAIL_WIDTH = 500; // 画像リサイズ後の横の長さの最大値
-const THUMBNAIL_HEIGHT = 500; // 画像リサイズ後の縦の長さの最大値
+const THUMBNAIL_WIDTH = 1000; // 画像リサイズ後の横の長さの最大値
+const THUMBNAIL_HEIGHT = 1000; // 画像リサイズ後の縦の長さの最大値
 
 $(function() {
   $('#upload').click(function() {
@@ -302,7 +302,7 @@ function check() {
     }
   ).done(function( data ){
     $(".area-score").show();
-    animateRate(Math.round(data.paripi * 100));
+    animateRate(Math.round((data.paripi -0.5) * 2 * 100));
   });
 }
 
